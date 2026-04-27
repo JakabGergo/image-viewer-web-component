@@ -57,6 +57,7 @@ export const styles = css`
     gap: 8px;
     overflow-x: auto;
     margin-top: 12px;
+    justify-content: center;
   }
   .thumb {
     width: 64px;
@@ -77,5 +78,11 @@ export const styles = css`
   }
   button.danger:hover {
     background: #fef2f2;
+  }
+  .toolbar {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
   }
 `;
