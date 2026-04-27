@@ -20,7 +20,6 @@ export const styles = css`
 
   #main-stage {
     position: relative;
-    background: #f5f5f5;
     border-radius: 12px;
     aspect-ratio: 16/9;
     display: flex;
@@ -32,6 +31,7 @@ export const styles = css`
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+    border-radius: 8px;
   }
 
   .nav {
@@ -50,6 +50,53 @@ export const styles = css`
   }
   .nav.next {
     right: 10px;
+  }
+
+  .nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    border: 0.5px solid #ddd;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+    transition: background 0.1s;
+    z-index: 2;
+    line-height: 1;
+  }
+  .nav-btn:hover {
+    background: #f3f3f3;
+  }
+  .nav-btn:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+
+  .tb-btn {
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    border: 0.5px solid #ddd;
+    background: transparent;
+    color: #444;
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  .tb-btn:hover {
+    background: #f3f3f3;
+  }
+  .tb-btn.danger {
+    color: #dc2626;
+    border-color: #fca5a5;
+  }
+  .tb-btn.danger:hover {
+    background: #fef2f2;
   }
 
   .thumbs {

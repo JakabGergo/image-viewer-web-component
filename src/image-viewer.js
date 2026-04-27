@@ -56,8 +56,8 @@ class ImageViewer extends LitElement {
         )}
       </div>
       <div class="toolbar">
-        <button @click=${this._openPicker}>+ Add more</button>
-        <button class="danger" @click=${this._removeCurrent}>
+        <button class="tb-btn" @click=${this._openPicker}>+ Add more</button>
+        <button class="tb-btn danger" @click=${this._removeCurrent}>
           Remove this image
         </button>
       </div>
