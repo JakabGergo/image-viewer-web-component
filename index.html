@@ -9,7 +9,17 @@
 
 <body>
     <image-viewer></image-viewer>
+    
     <script type="module" src="/src/image-viewer.js"></script>
+    <script type="module">
+        const viewer = document.querySelector('image-viewer');
+
+        const canRemove = true;
+        const canAdd = true;
+
+        if (!canRemove) viewer.setAttribute('no-remove', '');
+        if (!canAdd) viewer.setAttribute('no-add', '');
+    </script>
 </body>
 
 </html>

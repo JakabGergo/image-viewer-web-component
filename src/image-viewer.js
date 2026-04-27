@@ -6,6 +6,8 @@ class ImageViewer extends LitElement {
   static properties = {
     _images: { state: true },
     _current: { state: true },
+    noRemove: { type: Boolean, attribute: "no-remove" },
+    noAdd: { type: Boolean, attribute: "no-add" },
   };
 
   static styles = styles;
@@ -20,7 +22,12 @@ class ImageViewer extends LitElement {
     const imgs = this._images;
     const cur = this._current;
 
-    if (!imgs.length)
+    if (!imgs.length) {
+      if (this.noAdd) {
+        return html` <div id="drop-zone" style="cursor: not-allowed">
+          No images to display
+        </div>`;
+      }
       return html` <div
         id="drop-zone"
         @click=${this._openPicker}
@@ -33,7 +40,7 @@ class ImageViewer extends LitElement {
       >
         Drop images here or click to upload
       </div>`;
-
+    }
     return html`
       <div id="main-stage">
         <img class="main" src=${imgs[cur].url} alt=${imgs[cur].name} />
@@ -56,10 +63,16 @@ class ImageViewer extends LitElement {
         )}
       </div>
       <div class="toolbar">
-        <button class="tb-btn" @click=${this._openPicker}>+ Add more</button>
-        <button class="tb-btn danger" @click=${this._removeCurrent}>
-          Remove this image
-        </button>
+        ${this.noAdd
+          ? ""
+          : html`<button class="tb-btn" @click=${this._openPicker}>
+              + Add more
+            </button>`}
+        ${this.noRemove
+          ? ""
+          : html`<button class="tb-btn danger" @click=${this._removeCurrent}>
+              Remove this image
+            </button>`}
       </div>
     `;
   }
