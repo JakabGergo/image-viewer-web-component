@@ -71,4 +71,11 @@ export const styles = css`
     opacity: 1;
     border-color: #3b82f6;
   }
+  button.danger {
+    color: #dc2626;
+    border-color: #fca5a5;
+  }
+  button.danger:hover {
+    background: #fef2f2;
+  }
 `;

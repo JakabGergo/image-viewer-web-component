@@ -56,6 +56,7 @@ class ImageViewer extends LitElement {
         )}
       </div>
       <button @click=${this._openPicker}>+ Add more</button>
+      <button class="danger" @click=${this._removeCurrent}>Remove this image</button>
     `;
   }
 
@@ -83,6 +84,14 @@ class ImageViewer extends LitElement {
       .map((f) => ({ url: URL.createObjectURL(f), name: f.name }));
     this._images = [...this._images, ...newImgs];
     this._current = 0;
+  }
+
+  _removeCurrent() {
+    URL.revokeObjectURL(this._images[this._current].url);
+    const updated = [...this._images];
+    updated.splice(this._current, 1);
+    this._images = updated;
+    this._current = Math.min(this._current, this._images.length - 1);
   }
 }
 
