@@ -145,3 +145,7 @@ vite.config.ts.timestamp-*
 
 #Ignore vscode AI rules
 .github\instructions\codacy.instructions.md
+
+.env
+mc.exe
+dist/

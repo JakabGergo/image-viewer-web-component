@@ -2,7 +2,18 @@
   "name": "image-viewer-web-component",
   "version": "1.0.0",
   "description": "A framework-agnostic image upload &amp; viewer built with Lit",
-  "main": "index.js",
+  "main": "dist/image-viewer.js",
+  "module": "dist/image-viewer.js",
+  "exports": {
+    ".": "./dist/image-viewer.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "lit": "^3.0.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "vite",
