@@ -49,6 +49,16 @@
       </div>
 
       <div class="demo-card">
+        <span class="demo-tag readonly">Read only</span>
+        <p class="demo-card-title">Viewer only</p>
+        <p class="demo-card-desc">
+          Same MinIO bucket — but upload and delete are disabled. Perfect for
+          regular users.
+        </p>
+        <image-viewer id="viewer-readonly" no-add no-remove></image-viewer>
+      </div>
+
+      <div class="demo-card">
         <span class="demo-tag memory">Memory only</span>
         <p class="demo-card-title">Local memory</p>
         <p class="demo-card-desc">
@@ -102,9 +112,16 @@
           });
         };
 
-        minioViewer.loadImages();
+        const readonlyViewer = document.getElementById("viewer-readonly");
+        readonlyViewer.onLoad = async () => {
+          const res = await fetch("/api/images");
+          return await res.json();
+        };
 
-        });
+        readonlyViewer.loadImages();
+
+        minioViewer.loadImages();
+      });
     </script>
   </body>
 </html>

@@ -121,7 +121,7 @@ header a:hover {
 
 .demo-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 2rem;
     max-width: 1200px;
     margin: 0 auto;
@@ -223,4 +223,15 @@ footer {
     .demo-grid {
         grid-template-columns: 1fr;
     }
+}
+@media (max-width: 1024px) {
+    .demo-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.demo-tag.readonly {
+    background: #fff7ed;
+    color: #ea580c;
+    border: 0.5px solid #fed7aa;
 }
