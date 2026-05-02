@@ -232,6 +232,104 @@ Each `<image-viewer>` is completely independent — different storage, different
 
 ---
 
+## Demo application
+
+The demo page (`index.html`) in this repository connects to a **MinIO** storage server via a small **Express** backend (`server.js`). This is just one example of how to use the component with real storage — the component itself has no dependency on MinIO or Express.
+
+---
+
+### Architecture
+
+```
+Browser (index.html)
+      │
+      │ fetch /api/images
+      ▼
+Express server (server.js) running on port 3001
+      │
+      │ MinIO SDK
+      ▼
+MinIO bucket (fd-project-2026) running on port 9123
+```
+
+---
+
+### Requirements
+
+- [Node.js](https://nodejs.org)
+- [Docker](https://docker.com) — to run MinIO
+- A MinIO instance running locally
+
+---
+
+### Run MinIO with Docker
+
+```bash
+docker run -p 9123:9000 -p 9124:9001 \
+  -e MINIO_ROOT_USER=your_access_key \
+  -e MINIO_ROOT_PASSWORD=your_secret_key \
+  quay.io/minio/minio server /data --console-address ":9001"
+```
+
+Then open `http://localhost:9124` to access the MinIO console and create a bucket called `fd-project-2026`.
+
+---
+
+### Environment variables
+
+Create a `.env` file in the project root based on `.env.example`:
+
+```env
+VITE_MINIO_URL=http://localhost:9123
+VITE_MINIO_BUCKET=fd-project-2026
+VITE_MINIO_ACCESS_KEY=your_access_key
+VITE_MINIO_SECRET_KEY=your_secret_key
+```
+
+---
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+---
+
+### Run the demo
+
+Open two terminals:
+
+```bash
+# terminal 1 — Vite dev server
+npm run dev
+
+# terminal 2 — Express API server
+npm run server
+```
+
+Then open `http://localhost:5173`.
+
+---
+
+### API endpoints
+
+The Express server exposes three endpoints used by the demo:
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/images` | List all images from the bucket |
+| `POST` | `/api/images` | Upload a new image |
+| `DELETE` | `/api/images/:key` | Delete an image by key |
+
+---
+
+### Note
+
+The component itself is completely storage-agnostic. You can replace MinIO with any storage provider — S3, Cloudinary, Firebase, or your own backend — by providing your own `onLoad`, `onUpload`, and `onDelete` callbacks. See the [Custom storage](#custom-storage) section above.
+
+---
+
 ## License
 
 MIT © Gergő Jakab
