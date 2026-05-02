@@ -9,6 +9,7 @@ class ImageViewer extends LitElement {
     noRemove: { type: Boolean, attribute: "no-remove" },
     noAdd: { type: Boolean, attribute: "no-add" },
     showCounter: { type: Boolean, attribute: "show-counter" },
+    maxImages: { type: Number, attribute: "max-images" },
   };
 
   static styles = styles;
@@ -21,6 +22,7 @@ class ImageViewer extends LitElement {
     this.noRemove = false;
     this.noAdd = false;
     this.showCounter = false;
+    this.maxImages = null;
     this.onUpload = null; // async (file) => url
     this.onDelete = null; // async (image) => void
     this.onLoad = null; // async () => [{ url, name }]
@@ -33,7 +35,8 @@ class ImageViewer extends LitElement {
   async loadImages() {
     if (this.onLoad) {
       this._loading = true;
-      this._images = await this.onLoad();
+      const images = await this.onLoad();
+      this._images = this.maxImages ? images.slice(0, this.maxImages) : images;
       this._loading = false;
     }
   }
@@ -46,6 +49,7 @@ class ImageViewer extends LitElement {
   render() {
     const imgs = this._images;
     const cur = this._current;
+    const limitReached = this.maxImages && imgs.length >= this.maxImages;
 
     if (this._loading) {
       return html`<div id="drop-zone" style="cursor: default">
@@ -100,7 +104,7 @@ class ImageViewer extends LitElement {
         )}
       </div>
       <div class="toolbar">
-        ${this.noAdd
+        ${this.noAdd || limitReached
           ? ""
           : html`<button class="tb-btn" @click=${this._openPicker}>
               + Add more
@@ -133,9 +137,15 @@ class ImageViewer extends LitElement {
   }
 
   async _loadFiles(files) {
+    const remaining = this.maxImages
+      ? this.maxImages - this._images.length
+      : Infinity;
+    if (remaining <= 0) return;
+
     const newImgs = await Promise.all(
       Array.from(files)
         .filter((f) => f.type.startsWith("image/"))
+        .slice(0, remaining)
         .map(async (f) => {
           if (this.onUpload) {
             const url = await this.onUpload(f);
