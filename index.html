@@ -1,174 +1,10 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Image Viewer</title>
-    <style>
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-
-      body {
-        font-family: system-ui, sans-serif;
-        background: #f9f9f8;
-        color: #222;
-      }
-
-      header {
-        background: #fff;
-        border-bottom: 1px solid #e5e5e5;
-        padding: 1rem 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-
-      header h1 {
-        font-size: 1.1rem;
-        font-weight: 600;
-        letter-spacing: -0.01em;
-      }
-
-      header a {
-        font-size: 13px;
-        color: #555;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        border: 0.5px solid #ddd;
-        padding: 5px 12px;
-        border-radius: 8px;
-        transition: background 0.1s;
-      }
-      header a:hover {
-        background: #f3f3f3;
-      }
-
-      .hero {
-        text-align: center;
-        padding: 4rem 2rem 2.5rem;
-      }
-
-      .badge {
-        display: inline-block;
-        font-size: 12px;
-        background: #eef5ff;
-        color: #3b82f6;
-        border: 0.5px solid #bfdbfe;
-        border-radius: 20px;
-        padding: 3px 12px;
-        margin-bottom: 1rem;
-      }
-
-      .hero h2 {
-        font-size: 2.2rem;
-        font-weight: 700;
-        letter-spacing: -0.03em;
-        margin-bottom: 1rem;
-        line-height: 1.2;
-      }
-
-      .hero p {
-        font-size: 1rem;
-        color: #666;
-        max-width: 480px;
-        margin: 0 auto 2rem;
-        line-height: 1.6;
-      }
-
-      .features {
-        display: flex;
-        justify-content: center;
-        gap: 2rem;
-        flex-wrap: wrap;
-        margin-bottom: 3rem;
-      }
-
-      .feature {
-        font-size: 13px;
-        color: #555;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      .feature::before {
-        content: "";
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: #3b82f6;
-        flex-shrink: 0;
-      }
-
-      .demo {
-        max-width: 680px;
-        margin: 0 auto;
-        padding: 0 1.5rem 4rem;
-      }
-
-      .demo-label {
-        font-size: 12px;
-        color: #aaa;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        margin-bottom: 1rem;
-      }
-
-      image-viewer {
-        display: block;
-      }
-
-      .install {
-        background: #fff;
-        border-top: 1px solid #e5e5e5;
-        padding: 3rem 2rem;
-        text-align: center;
-      }
-
-      .install h3 {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-      }
-
-      .install pre {
-        display: inline-block;
-        background: #f3f3f3;
-        border: 0.5px solid #e5e5e5;
-        border-radius: 8px;
-        padding: 0.75rem 1.5rem;
-        font-size: 14px;
-        font-family: monospace;
-        color: #333;
-        margin-bottom: 1rem;
-      }
-
-      .install p {
-        font-size: 13px;
-        color: #888;
-      }
-
-      .install a {
-        color: #3b82f6;
-        text-decoration: none;
-      }
-      .install a:hover {
-        text-decoration: underline;
-      }
-
-      footer {
-        text-align: center;
-        padding: 1.5rem;
-        font-size: 12px;
-        color: #bbb;
-        border-top: 1px solid #e5e5e5;
-      }
-    </style>
+    <link rel="stylesheet" href="/src/index.css" />
   </head>
 
   <body>
@@ -202,10 +38,26 @@
       </div>
     </section>
 
-    <section class="demo">
-      <p class="demo-label">Live demo</p>
-      <image-viewer id="viewer"></image-viewer>
-    </section>
+    <div class="demo-grid">
+      <div class="demo-card">
+        <span class="demo-tag minio">MinIO storage</span>
+        <p class="demo-card-title">Persistent storage</p>
+        <p class="demo-card-desc">
+          Images are uploaded to MinIO and survive page refresh.
+        </p>
+        <image-viewer id="viewer-minio"></image-viewer>
+      </div>
+
+      <div class="demo-card">
+        <span class="demo-tag memory">Memory only</span>
+        <p class="demo-card-title">Local memory</p>
+        <p class="demo-card-desc">
+          Images live in memory only — gone on refresh. Independent from the
+          other viewer.
+        </p>
+        <image-viewer id="viewer-memory"></image-viewer>
+      </div>
+    </div>
 
     <section class="install">
       <h3>Get started</h3>
@@ -225,14 +77,15 @@
     <script type="module" src="/src/image-viewer.js"></script>
     <script type="module">
       customElements.whenDefined("image-viewer").then(async () => {
-        const viewer = document.getElementById("viewer");
+        // --- MinIO viewer ---
+        const minioViewer = document.getElementById("viewer-minio");
 
-        viewer.onLoad = async () => {
+        minioViewer.onLoad = async () => {
           const res = await fetch("/api/images");
           return await res.json();
         };
 
-        viewer.onUpload = async (file) => {
+        minioViewer.onUpload = async (file) => {
           const formData = new FormData();
           formData.append("file", file);
           const res = await fetch("/api/images", {
@@ -243,15 +96,15 @@
           return data.url;
         };
 
-        viewer.onDelete = async (image) => {
+        minioViewer.onDelete = async (image) => {
           await fetch(`/api/images/${encodeURIComponent(image.name)}`, {
             method: "DELETE",
           });
         };
 
-          viewer.loadImages();
+        minioViewer.loadImages();
 
-      });
+        });
     </script>
   </body>
 </html>
