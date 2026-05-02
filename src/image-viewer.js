@@ -23,13 +23,34 @@ class ImageViewer extends LitElement {
     this.noAdd = false;
     this.showCounter = false;
     this.maxImages = null;
+    this._zoomed = false;
+    this._zoomEl = null;
+    this._active = false;
     this.onUpload = null; // async (file) => url
     this.onDelete = null; // async (image) => void
     this.onLoad = null; // async () => [{ url, name }]
   }
 
-  async connectedCallback() {
+  connectedCallback() {
     super.connectedCallback();
+    this._onKeyDown = (e) => {
+      if (e.key === "Escape") this._closeZoom();
+      if (e.key === "ArrowLeft" && (this._zoomed || this._active)) {
+        e.preventDefault();
+        this._go(this._current - 1);
+      }
+      if (e.key === "ArrowRight" && (this._zoomed || this._active)) {
+        e.preventDefault();
+        this._go(this._current + 1);
+      }
+    };
+    document.addEventListener("keydown", this._onKeyDown);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    document.removeEventListener("keydown", this._onKeyDown);
+    this._closeZoom();
   }
 
   async loadImages() {
@@ -79,7 +100,13 @@ class ImageViewer extends LitElement {
 
     return html`
       <div id="main-stage">
-        <img class="main" src=${imgs[cur].url} alt=${imgs[cur].name} />
+        <img
+          class="main"
+          src=${imgs[cur].url}
+          alt=${imgs[cur].name}
+          @click=${this._toggleZoom}
+          style="cursor: zoom-in;"
+        />
         <button class="nav prev" @click=${() => this._go(cur - 1)}>
           &#8592;
         </button>
@@ -123,12 +150,23 @@ class ImageViewer extends LitElement {
   }
 
   _go(idx) {
+    this._active = true;
+    document.querySelectorAll("image-viewer").forEach((v) => {
+      if (v !== this) v._active = false;
+    });
+
     this._current = (idx + this._images.length) % this._images.length;
     this._dispatch("image-changed", {
       index: this._current,
       name: this._images[this._current].name,
       url: this._images[this._current].url,
     });
+
+    if (this._zoomed && this._zoomEl) {
+      const img = this._images[this._current];
+      this._zoomEl.querySelector("img").src = img.url;
+      this._zoomEl.querySelector("img").alt = img.name;
+    }
   }
 
   _onDrop(e) {
@@ -196,6 +234,50 @@ class ImageViewer extends LitElement {
       count: this._images.length,
       images: this._images,
     });
+  }
+
+  _openZoom() {
+    const img = this._images[this._current];
+
+    this._zoomEl = document.createElement("div");
+    this._zoomEl.id = "iv-zoom-overlay";
+    this._zoomEl.innerHTML = `
+    <img src="${img.url}" alt="${img.name}" />
+  `;
+
+    this._zoomEl.style.cssText = `
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    cursor: zoom-out;
+  `;
+
+    this._zoomEl.querySelector("img").style.cssText = `
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 8px;
+  `;
+
+    this._zoomEl.addEventListener("click", () => this._closeZoom());
+    document.body.appendChild(this._zoomEl);
+    this._zoomed = true;
+  }
+
+  _closeZoom() {
+    if (this._zoomEl) {
+      document.body.removeChild(this._zoomEl);
+      this._zoomEl = null;
+    }
+    this._zoomed = false;
+  }
+
+  _toggleZoom() {
+    this._zoomed ? this._closeZoom() : this._openZoom();
   }
 }
 
