@@ -118,8 +118,17 @@ class ImageViewer extends LitElement {
     `;
   }
 
+  _dispatch(name, detail) {
+    this.dispatchEvent(new CustomEvent(name, { bubbles: true, detail }));
+  }
+
   _go(idx) {
     this._current = (idx + this._images.length) % this._images.length;
+    this._dispatch("image-changed", {
+      index: this._current,
+      name: this._images[this._current].name,
+      url: this._images[this._current].url,
+    });
   }
 
   _onDrop(e) {
@@ -142,20 +151,33 @@ class ImageViewer extends LitElement {
       : Infinity;
     if (remaining <= 0) return;
 
-    const newImgs = await Promise.all(
-      Array.from(files)
-        .filter((f) => f.type.startsWith("image/"))
-        .slice(0, remaining)
-        .map(async (f) => {
-          if (this.onUpload) {
-            const url = await this.onUpload(f);
-            return { url, name: f.name };
-          }
-          return { url: URL.createObjectURL(f), name: f.name };
-        }),
-    );
+    const newImgs = (
+      await Promise.all(
+        Array.from(files)
+          .filter((f) => f.type.startsWith("image/"))
+          .slice(0, remaining)
+          .map(async (f) => {
+            if (this.onUpload) {
+              try {
+                const url = await this.onUpload(f);
+                return { url, name: f.name };
+              } catch (error) {
+                this._dispatch("upload-error", { file: f, error });
+                return null;
+              }
+            }
+            return { url: URL.createObjectURL(f), name: f.name };
+          }),
+      )
+    ).filter(Boolean);
+
     this._images = [...this._images, ...newImgs];
     this._current = 0;
+
+    this._dispatch("images-changed", {
+      count: this._images.length,
+      images: this._images,
+    });
   }
 
   async _removeCurrent() {
@@ -169,6 +191,11 @@ class ImageViewer extends LitElement {
     updated.splice(this._current, 1);
     this._images = updated;
     this._current = Math.min(this._current, this._images.length - 1);
+
+    this._dispatch("images-changed", {
+      count: this._images.length,
+      images: this._images,
+    });
   }
 }
 

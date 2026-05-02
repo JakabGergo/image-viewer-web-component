@@ -112,6 +112,23 @@
           });
         };
 
+        minioViewer.addEventListener("image-changed", (e) => {
+          console.log(
+            "Navigated to:",
+            e.detail.name,
+            "at index",
+            e.detail.index,
+          );
+        });
+
+        minioViewer.addEventListener("images-changed", (e) => {
+          console.log("Total images:", e.detail.count);
+        });
+
+        minioViewer.addEventListener("upload-error", (e) => {
+          console.log("Upload failed for:", e.detail.file.name, e.detail.error);
+        });
+
         const readonlyViewer = document.getElementById("viewer-readonly");
         readonlyViewer.onLoad = async () => {
           const res = await fetch("/api/images");
