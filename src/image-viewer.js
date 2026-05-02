@@ -1,4 +1,3 @@
-// image-viewer.js
 import { LitElement, html } from "lit";
 import { styles } from "./image-viewer.styles.js";
 
@@ -6,6 +5,7 @@ class ImageViewer extends LitElement {
   static properties = {
     _images: { state: true },
     _current: { state: true },
+    _loading: { state: true },
     noRemove: { type: Boolean, attribute: "no-remove" },
     noAdd: { type: Boolean, attribute: "no-add" },
   };
@@ -16,19 +16,46 @@ class ImageViewer extends LitElement {
     super();
     this._images = [];
     this._current = 0;
+    this._loading = false;
+    this.onUpload = null; // async (file) => url
+    this.onDelete = null; // async (image) => void
+    this.onLoad = null; // async () => [{ url, name }]
+  }
+
+  async connectedCallback() {
+    super.connectedCallback();
+  }
+
+  async loadImages() {
+    if (this.onLoad) {
+      this._loading = true;
+      this._images = await this.onLoad();
+      this._loading = false;
+    }
+  }
+
+  set images(val) {
+    this._images = val;
+    this._current = 0;
   }
 
   render() {
     const imgs = this._images;
     const cur = this._current;
 
+    if (this._loading) {
+      return html`<div id="drop-zone" style="cursor: default">
+        Loading images...
+      </div>`;
+    }
+
     if (!imgs.length) {
       if (this.noAdd) {
-        return html` <div id="drop-zone" style="cursor: not-allowed">
+        return html`<div id="drop-zone" style="cursor: not-allowed">
           No images to display
         </div>`;
       }
-      return html` <div
+      return html`<div
         id="drop-zone"
         @click=${this._openPicker}
         @dragover=${(e) => {
@@ -41,6 +68,7 @@ class ImageViewer extends LitElement {
         Drop images here or click to upload
       </div>`;
     }
+
     return html`
       <div id="main-stage">
         <img class="main" src=${imgs[cur].url} alt=${imgs[cur].name} />
@@ -95,16 +123,29 @@ class ImageViewer extends LitElement {
     inp.click();
   }
 
-  _loadFiles(files) {
-    const newImgs = Array.from(files)
-      .filter((f) => f.type.startsWith("image/"))
-      .map((f) => ({ url: URL.createObjectURL(f), name: f.name }));
+  async _loadFiles(files) {
+    const newImgs = await Promise.all(
+      Array.from(files)
+        .filter((f) => f.type.startsWith("image/"))
+        .map(async (f) => {
+          if (this.onUpload) {
+            const url = await this.onUpload(f);
+            return { url, name: f.name };
+          }
+          return { url: URL.createObjectURL(f), name: f.name };
+        }),
+    );
     this._images = [...this._images, ...newImgs];
     this._current = 0;
   }
 
-  _removeCurrent() {
-    URL.revokeObjectURL(this._images[this._current].url);
+  async _removeCurrent() {
+    const image = this._images[this._current];
+    if (this.onDelete) {
+      await this.onDelete(image);
+    } else {
+      URL.revokeObjectURL(image.url);
+    }
     const updated = [...this._images];
     updated.splice(this._current, 1);
     this._images = updated;
