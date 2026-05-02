@@ -8,6 +8,7 @@ class ImageViewer extends LitElement {
     _loading: { state: true },
     noRemove: { type: Boolean, attribute: "no-remove" },
     noAdd: { type: Boolean, attribute: "no-add" },
+    showCounter: { type: Boolean, attribute: "show-counter" },
   };
 
   static styles = styles;
@@ -17,6 +18,9 @@ class ImageViewer extends LitElement {
     this._images = [];
     this._current = 0;
     this._loading = false;
+    this.noRemove = false;
+    this.noAdd = false;
+    this.showCounter = false;
     this.onUpload = null; // async (file) => url
     this.onDelete = null; // async (image) => void
     this.onLoad = null; // async () => [{ url, name }]
@@ -79,6 +83,11 @@ class ImageViewer extends LitElement {
           &#8594;
         </button>
       </div>
+
+      ${this.showCounter
+        ? html`<div id="counter">${cur + 1} / ${imgs.length}</div>`
+        : ""}
+
       <div class="thumbs">
         ${imgs.map(
           (img, i) => html`

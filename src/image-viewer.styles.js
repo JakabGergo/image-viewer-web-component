@@ -132,4 +132,13 @@ export const styles = css`
     gap: 12px;
     margin-top: 12px;
   }
+
+  #counter {
+    text-align: center;
+    font-size: 12px;
+    color: #888;
+    border-radius: 20px;
+    background: white;
+    margin-top: 8px;
+  }
 `;
