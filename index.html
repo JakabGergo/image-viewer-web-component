@@ -2,24 +2,214 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Image Viewer</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Viewer</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f9f9f8;
+      color: #222;
+    }
+
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e5e5e5;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    header h1 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    header a {
+      font-size: 13px;
+      color: #555;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 0.5px solid #ddd;
+      padding: 5px 12px;
+      border-radius: 8px;
+      transition: background 0.1s;
+    }
+    header a:hover { background: #f3f3f3; }
+
+    .hero {
+      text-align: center;
+      padding: 4rem 2rem 2.5rem;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 12px;
+      background: #eef5ff;
+      color: #3b82f6;
+      border: 0.5px solid #bfdbfe;
+      border-radius: 20px;
+      padding: 3px 12px;
+      margin-bottom: 1rem;
+    }
+
+    .hero h2 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      font-size: 1rem;
+      color: #666;
+      max-width: 480px;
+      margin: 0 auto 2rem;
+      line-height: 1.6;
+    }
+
+    .features {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+    }
+
+    .feature {
+      font-size: 13px;
+      color: #555;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .feature::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #3b82f6;
+      flex-shrink: 0;
+    }
+
+    .demo {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 1.5rem 4rem;
+    }
+
+    .demo-label {
+      font-size: 12px;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 1rem;
+    }
+
+    image-viewer {
+      display: block;
+    }
+
+    .install {
+      background: #fff;
+      border-top: 1px solid #e5e5e5;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+
+    .install h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .install pre {
+      display: inline-block;
+      background: #f3f3f3;
+      border: 0.5px solid #e5e5e5;
+      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
+      font-size: 14px;
+      font-family: monospace;
+      color: #333;
+      margin-bottom: 1rem;
+    }
+
+    .install p {
+      font-size: 13px;
+      color: #888;
+    }
+
+    .install a { color: #3b82f6; text-decoration: none; }
+    .install a:hover { text-decoration: underline; }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 12px;
+      color: #bbb;
+      border-top: 1px solid #e5e5e5;
+    }
+  </style>
 </head>
 
 <body>
-    <image-viewer></image-viewer>
-    
-    <script type="module" src="/src/image-viewer.js"></script>
-    <script type="module">
-        const viewer = document.querySelector('image-viewer');
 
-        const canRemove = true;
-        const canAdd = true;
+  <header>
+    <h1>image-viewer-wc</h1>
+    <a href="https://github.com/JakabGergo/image-viewer-web-component.git" target="_blank">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.579.688.481C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+      </svg>
+      GitHub
+    </a>
+  </header>
 
-        if (!canRemove) viewer.setAttribute('no-remove', '');
-        if (!canAdd) viewer.setAttribute('no-add', '');
-    </script>
+  <section class="hero">
+    <span class="badge">Web Component</span>
+    <h2>Image Viewer</h2>
+    <p>A lightweight, framework-agnostic image upload and viewer built with Lit. Drop it into React, Vue, Angular, or plain HTML.</p>
+    <div class="features">
+      <span class="feature">Drag & drop upload</span>
+      <span class="feature">Thumbnail navigation</span>
+      <span class="feature">Custom storage</span>
+      <span class="feature">Zero dependencies</span>
+    </div>
+  </section>
+
+  <section class="demo">
+    <p class="demo-label">Live demo</p>
+    <image-viewer id="viewer"></image-viewer>
+  </section>
+
+  <section class="install">
+    <h3>Get started</h3>
+    <pre>npm install image-viewer-wc</pre>
+    <p>Then use it anywhere — <a href="https://github.com/JakabGergo/image-viewer-web-component.git" target="_blank">read the docs on GitHub</a></p>
+  </section>
+
+  <footer>
+    Built with Lit &middot; Gergő Jakab &copy; 2026
+  </footer>
+
+  <script type="module" src="/src/image-viewer.js"></script>
+  <script type="module">
+    const viewer = document.getElementById('viewer');
+
+    const canRemove = true;
+    const canAdd = true;
+
+    if (!canRemove) viewer.setAttribute('no-remove', '');
+    if (!canAdd) viewer.setAttribute('no-add', '');
+  </script>
+
 </body>
-
 </html>
