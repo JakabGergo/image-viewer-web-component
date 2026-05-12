@@ -236,6 +236,8 @@ Each `<image-viewer>` is completely independent — different storage, different
 
 The demo page (`index.html`) in this repository connects to a **MinIO** storage server via a small **Express** backend (`server.js`). This is just one example of how to use the component with real storage — the component itself has no dependency on MinIO or Express.
 
+<img width="825" height="826" alt="image" src="https://github.com/user-attachments/assets/8fe95685-255b-4d1a-82c2-288e9fbfb855" />
+
 ---
 
 ### Architecture
